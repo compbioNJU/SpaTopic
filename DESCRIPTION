@@ -1,0 +1,40 @@
+Package: SpaTopic
+Type: Package
+Title: SpaTopic
+Version: 0.1.0
+Author: c(
+  person("Yuelei","Zhang",role = c("aut","cre"),email = "zyll1997@126.com"),
+  person("Bianjiong","Yu",role = "cre"),
+  person("Xiaolong","Zhou",role = "ctb"),
+  person("Dijun","Chen",role = "ths"))
+Maintainer: Yuelei Zhang <zyll1997@126.com>
+Description: SpaTopic, a versatile statistical learning framework that harmonizes 
+    spatial clustering and cell-type deconvolution by integrating single-cell 
+    transcriptomics and SRT data. Through topic modelling of cell-type contributions 
+    across spatial domains, SpaTopic allows for stratification of the TME into 
+    spatial domains with coherent cellular organization, and thus facilitates 
+    the refined annotation of spatial architecture with improved performance.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.1
+Imports: 
+    modeltools,
+    slam,
+    stats,
+    topicmodels
+Collate: 
+    'SpaTopic_function.R'
+    'SpaTopic.R'
+    'data.R'
+Suggests: 
+    knitr,
+    rmarkdown,
+    ggplot2,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Depends: 
+    R (>= 2.10)
+URL: https://github.com/compbioNJU/SpaTopic
+BugReports: https://github.com/compbioNJU/SpaTopic/issues
+VignetteBuilder: knitr

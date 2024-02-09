@@ -1,0 +1,147 @@
+---
+title: "Simply usage"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{introduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = ""
+)
+```
+
+```{r setup}
+library(SpaTopic)
+```
+
+### Data input
+
+SpaTopic requires two inputs:
+
+-   `spot_celltype`: The result of the deconvolution of single-cell and spatial transcriptome data, or a matrix with rows as spots and columns as cell types.\*
+
+-   `spot_clusters`: A datafream with spot group information.\*
+
+And they should be like
+
+```{r}
+data(spot_celltype)
+data(spot_clusters)
+head(spot_celltype)
+```
+
+```{r}
+head(spot_clusters)
+```
+
+\*The data used here is from [CARD](https://github.com/YMa-lab/CARD) and [BayesSpace](https://github.com/edward130603/BayesSpace).
+
+### Simply usage
+
+Enter the deconvolution result `spot_celltype` and the grouping information of the spot `spot_clusters` to get an `result_list` :
+
+-   `CellTopic` is a data frame which can be add to a Seurat object.
+
+-   `domain_topic` is a data frame, row is CellTopic and col is domain.
+
+-   `celltype_topic` is a data frame, row is celltype and col is CellTopic.
+
+-   `Cell_topic` is a vector of which topic be chosen in each CellTopic.
+
+For subsequent analyses, `CellTopic` and `celltype_topic` are mainly used.
+
+```{r, warning=FALSE}
+result_list <- CellTopic(
+  spot_celltype,
+  spot_clusters,
+  cluster = "spatial.cluster",
+  num_topics = 15
+)
+```
+
+You can use this method to show the spatial distribution of CellTopics.
+
+```{r}
+head(result_list[["CellTopic"]])
+# library(Seurat)
+# st_obj is a seurat object
+# st_obj <- AddMetaData(st_obj, result_list[["CellTopic"]])
+# SpatialDimPlot(st_obj, group.by = "CellTopic")
+```
+
+```{r}
+head(result_list[["celltype_topic"]])
+```
+
+And use this to show the cell type score for each CellTopic.
+
+```{r, fig.height = 5}
+library(ggplot2)
+plot_data <- result_list[["celltype_topic"]]
+plot_data$CellType <- rownames(plot_data)
+ggplot(plot_data, 
+       aes(x = reorder(CellType, CellTopic1, decreasing = TRUE), y = CellTopic1)) +
+  geom_bar(aes(fill = CellType), stat = "identity", width = 0.7) +
+  xlab("CellType") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
+```
+
+### Optional parameters
+
+```{r, warning=FALSE}
+result_list <- CellTopic(
+  spot_celltype,
+  spot_clusters,
+  cluster = "spatial.cluster",
+  num_topics = 13,
+  percent = 0.7
+)
+```
+
+We recommend that the value of the `num_topics` is generally slightly larger than the group number of spot.
+
+The larger the `percent`, the more dependent the results of deconvolution. We recommend using a value of 0.5-0.9.
+
+### Another strategy
+
+If you want to focus less on percentages and more on the information carried by a single topic, you can use `Binarization = TRUE` .
+
+```{r, warning=FALSE}
+result_list <- CellTopic(
+  spot_celltype,
+  spot_clusters,
+  cluster = "spatial.cluster",
+  num_topics = 13,
+  Binarization = TRUE
+)
+plot_data <- result_list[["celltype_topic"]]
+plot_data$CellType <- rownames(plot_data)
+ggplot(plot_data, 
+       aes(x = reorder(CellType, CellTopic1, decreasing = TRUE), y = CellTopic1)) +
+  geom_bar(aes(fill = CellType), stat = "identity", width = 0.7) +
+  xlab("CellType") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
+```
+
+### Meta Topic
+
+If you want to explore different spatial domains based on the cell type division of the CellTopic, we provide a simple clustering option, `meta.cell = TRUE`.
+
+```{r, warning=FALSE}
+result_list <- CellTopic(
+  spot_celltype,
+  spot_clusters,
+  cluster = "spatial.cluster",
+  num_topics = 13,
+  percent = 0.7,
+  meta.cell = TRUE,
+  k = 3
+)
+head(result_list[["MetaTopic"]])
+```
+
+k is a integer of how much MetaTopic to choose. method is the agglomeration method to be used.

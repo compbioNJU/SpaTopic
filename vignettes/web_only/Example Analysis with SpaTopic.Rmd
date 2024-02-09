@@ -1,0 +1,155 @@
+---
+title: "Example Analysis with SpaTopic"
+output: html_document
+date: "2024-02-04"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Load data
+
+```{r, message = FALSE}
+library(Seurat)
+library(SpaTopic)
+library(ggplot2)
+library(cowplot)
+library(patchwork)
+library(pheatmap)
+my_colors <- c("#66b803", "#E5AA9B", "#FABD3E", "#2B8CBE", "#DE77AE", "#9970AB", "gray", "#D5E4A2", "#71D0F5", "#B1746F", "#ADE2D0", "#20DE8BFF", "#CCDE8BFF", "#FFDE8BFF", "#FFA88BFF")
+load("D:/code/SpaTopic/vignettes/web_only/PDAC_obj.rda")
+data(spot_celltype)
+data(spot_clusters)
+PDAC_obj <- AddMetaData(PDAC_obj, spot_clusters["spatial.cluster"])
+Idents(PDAC_obj) <- PDAC_obj@meta.data["spatial.cluster"]
+```
+
+### About data
+
+The data used can be obtained from [GEO](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE111672), which is divided into 4 spatial domains according to clustering.
+
+```{r, message = FALSE, out.width = '50%', fig.show = "hold", fig.height = 3, fig.width = 4}
+DimPlot(PDAC_obj, group.by = 'spatial.cluster', reduction = "umap",cols = my_colors)
+SpatialDimPlot(PDAC_obj, label = FALSE, group.by = "spatial.cluster", pt.size.factor = 8) + scale_fill_manual(values = my_colors) + coord_flip()+ scale_y_reverse()
+```
+
+### Use SpaTopic
+
+### KS test
+
+First, we use kstest to calculate the specificity score for cell types across different spot clusters.
+
+```{r, warning = FALSE, fig.height = 3, fig.width = 6}
+domain_cellytpe <- ksTest(spot_celltype, spot_clusters, cluster = "spatial.cluster")
+pheatmap(domain_cellytpe, cluster_rows = FALSE, cluster_cols = FALSE,
+         cellwidth = 20, cellheight = 20)
+```
+
+### LDA
+
+Then we can get the topic that can represent the spatial domain through the Latent Dirichlet Allocation (LDA).
+
+```{r}
+topic_list <- MatrixFactorization(domain_cellytpe, num_topics = 13)
+dt_topic_data <- topic_list[["domain_topic"]]
+ct_topic_data <- topic_list[["celltype_topic"]]
+```
+
+```{r}
+# plot prepare
+df <- as.data.frame(t(dt_topic_data[,match(PDAC_obj$spatial.cluster,gsub("spot_domain_", "", colnames(dt_topic_data)))]))
+rownames(df) <- colnames(PDAC_obj)
+PDAC_obj <- AddMetaData(PDAC_obj, df)
+colors_num <- ncol(dt_topic_data)
+topics <- colnames(ct_topic_data)
+bar_plot_data <- ct_topic_data
+bar_plot_data$CellType <- rownames(ct_topic_data)
+```
+
+```{r, message = FALSE}
+plot_list <- list()
+for (i in seq_along(topics)){
+  p <- SpatialPlot(PDAC_obj, group.by = topics[i], pt.size.factor = 8, stroke = NA) + scale_fill_manual(values = rev(pals::brewer.spectral(colors_num))) + NoAxes() + NoLegend() + coord_flip() + scale_y_reverse()
+  bar_plot <- ggplot(bar_plot_data, aes(x = reorder(CellType, !!sym(topics[i]), decreasing = TRUE), y = .data[[topics[i]]])) +
+    geom_bar(aes(fill = CellType), stat='identity', width = 0.7) +
+    xlab('CellType') +
+    scale_fill_manual(values = my_colors) +
+    theme_minimal() + NoGrid() + 
+    theme(legend.key.size = unit(0.3, "cm"), 
+          legend.position = "none",
+          axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 8))
+  plot_list[[i]] <- ggdraw() + 
+    draw_plot(p, 0, 0.2, 1, 1, scale = 0.7) + 
+    draw_plot(bar_plot, 0.1, 0, 0.7, 0.5, scale = 1)
+}
+# show all plots
+```
+
+```{r, echo=FALSE, fig.height = 30, fig.width = 13}
+plot_list[[1]]+plot_list[[2]]+plot_list[[3]]+plot_list[[4]]+plot_list[[5]]+plot_list[[6]]+plot_list[[7]]+plot_list[[8]]+plot_list[[9]]+plot_list[[10]]+plot_list[[11]]+plot_list[[12]]+plot_list[[13]]+plot_layout(ncol=3)
+```
+
+### CellTopic
+
+In order to assign a spatial cluster to one or more specific topics, we try to find CellTopic of each spot cluster.
+
+```{r, message = FALSE, warning = FALSE, out.width = '50%', fig.show = "hold", fig.height = 6, fig.width = 5}
+result_list <- FindCellTopic(dt_topic_data, ct_topic_data, spot_clusters, cluster = "spatial.cluster", percent = 0.7)
+PDAC_obj <- AddMetaData(PDAC_obj, result_list[["CellTopic"]])
+SpatialDimPlot(PDAC_obj, label = FALSE, group.by = "CellTopic", pt.size.factor = 8) + scale_fill_manual(values = my_colors) + coord_flip()+ scale_y_reverse()
+pheatmap(result_list[["celltype_topic"]], 
+               cluster_rows = FALSE, 
+               cellwidth = 20, cellheight = 20)
+```
+
+### Cell-Cell communication
+
+Use [CellChat](https://github.com/jinworks/CellChat) Computes communication between spatial domains.
+
+```{r, message = FALSE}
+library(CellChat)
+# Create cellchat object
+data.input <- GetAssayData(PDAC_obj, assay = "Spatial", slot = "data")
+identity = data.frame(group =PDAC_obj$CellTopic, row.names = names(PDAC_obj$CellTopic))
+cellchat <- createCellChat(object = data.input, meta = identity, group.by = "group")
+# Selective ligand receptor database
+CellChatDB <- CellChatDB.human
+cellchat@DB <- CellChatDB
+cellchat <- subsetData(cellchat)
+# Calculation
+# future::plan("multiprocess", workers = 10)
+cellchat <- identifyOverExpressedGenes(cellchat)
+cellchat <- identifyOverExpressedInteractions(cellchat)
+cellchat <- projectData(cellchat, PPI.human)
+#cellchat <- filterCommunication(cellchat, min.cells = 10) # Do not filter spot
+cellchat <- computeCommunProb(cellchat, raw.use = FALSE, population.size = TRUE)
+cellchat <- computeCommunProbPathway(cellchat)
+df.net <- subsetCommunication(cellchat)
+```
+
+Communication between different spatial domains from the perspective of pathway.
+
+```{r, warning = FALSE, fig.height = 10, fig.width = 4}
+df.netp <- subsetCommunication(cellchat, slot.name = "netP")
+df.netp$sTot <- paste0(df.netp$source, " -> ", df.netp$target)
+df.netp <- subset(df.netp, sTot %in% c("CellTopic1 -> CellTopic1","CellTopic1 -> CellTopic2","CellTopic1 -> CellTopic3","CellTopic1 -> CellTopic4","CellTopic2 -> CellTopic1","CellTopic3 -> CellTopic1","CellTopic4 -> CellTopic1","CellTopic2 -> CellTopic4","CellTopic4 -> CellTopic2","CellTopic2 -> CellTopic2","CellTopic3 -> CellTopic3","CellTopic4 -> CellTopic4"))
+df.netp$sTot <- factor(df.netp$sTot,levels = c("CellTopic2 -> CellTopic4","CellTopic4 -> CellTopic2","CellTopic1 -> CellTopic2","CellTopic2 -> CellTopic1","CellTopic1 -> CellTopic3","CellTopic3 -> CellTopic1","CellTopic1 -> CellTopic4","CellTopic4 -> CellTopic1","CellTopic1 -> CellTopic1","CellTopic2 -> CellTopic2","CellTopic3 -> CellTopic3","CellTopic4 -> CellTopic4"))
+df.netp <- rbind(df.netp, data.frame(
+    source = c(NA,NA,NA), 
+    target = c(NA,NA,NA), 
+    pathway_name = c("VTN","VTN","VTN"), # It's just for showing the parts without communication, "VTN" has no particularity.
+    prob = c(0,0,0), 
+    pval = c(NA,NA,NA), 
+    sTot = c("CellTopic1 -> CellTopic2","CellTopic2 -> CellTopic1","CellTopic3 -> CellTopic1")))
+library('RColorBrewer')
+ggplot(df.netp, aes(x=sTot, y=pathway_name)) + 
+    geom_point(aes(size=pval, color=log10(prob))) + 
+    scale_size(range = c(4, 2), breaks = c(0.01,max(df.netp$pval[!is.na(df.netp$pval)])), labels = c("p<0.01","0.01<p<0.05")) + 
+    scale_colour_distiller(palette="Spectral", labels = c("low","high"), breaks = c(log10(min(df.netp$prob[df.netp$prob!=0])),log10(max(df.netp$prob)))) +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank()) +
+    labs(size = "p-value", color = "Commun.prob")
+```
