@@ -3,7 +3,7 @@
 \docType{data}
 \name{spot_clusters}
 \alias{spot_clusters}
-\title{Clustering results of the spatial transcriptome}
+\title{Clustering results of the spatial transcriptome.}
 \format{
 A data frame with 428 rows and 5 variables:
 \describe{
@@ -19,6 +19,6 @@ A data frame with 428 rows and 5 variables:
 spot_clusters
 }
 \description{
-A data frame of clustering result obtained by BayesSpace
+A data frame of clustering result obtained by BayesSpace.
 }
-\keyword{datasets}
+\keyword{internal}

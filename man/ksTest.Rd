@@ -21,6 +21,6 @@ clustering information in spot_clusters.}
 A data frame, row is spot_domain, col is celltype score.
 }
 \description{
-KS test is performed on the deconvolution results and the overall level of
+Kolmogorov-Smirnov (KS) test is performed on the deconvolution results and the overall level of
 each cluster.
 }

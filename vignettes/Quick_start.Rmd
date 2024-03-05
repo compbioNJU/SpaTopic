@@ -1,0 +1,154 @@
+---
+title: "Quick start"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Quick start}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "",
+  warning = FALSE
+)
+```
+
+```{r}
+library(SpaTopic)
+library(ggplot2)
+my_colors <- c("#66b803", "#E5AA9B", "#FABD3E", "#2B8CBE", "#DE77AE", "#9970AB", "gray", "#D5E4A2", "#71D0F5", "#B1746F", "#ADE2D0", "#20DE8BFF", "#CCDE8BFF", "#FFDE8BFF", "#FFA88BFF", "#FF6A8BFF")
+```
+
+## Load data
+
+SpaTopic requires two inputs:
+
+-   `spot_celltype`: The result of the deconvolution of single-cell and spatial transcriptome data, or a matrix with rows as spots and columns as cell types.\*
+
+-   `spot_clusters`: A dataframe with spot domain information.\*
+
+And they should be like
+
+```{r}
+data("spot_celltype")
+data("spot_clusters")
+head(spot_celltype)
+```
+
+```{r}
+head(spot_clusters)
+```
+
+\*The data used here is from [CARD](https://github.com/YMa-lab/CARD) (`spot_celltype`) and [BayesSpace](https://github.com/edward130603/BayesSpace) (`spot_clusters`).
+
+### About data
+
+The corresponding Seurat object data can also be obtained from [GEO](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE111672). (Data used here is processed by SCTransform) The `spot_celltype` and `spot_clusters` is based on it.
+
+```{r, message = FALSE, out.width = '50%', fig.show = "hold", fig.height = 4, fig.width = 5}
+load("vignette_data/PDAC_obj.rda")
+PDAC_obj <- AddMetaData(PDAC_obj, spot_clusters["spatial.cluster"])
+DimPlot(PDAC_obj, group.by = 'spatial.cluster', reduction = "umap",cols = my_colors)
+SpatialDimPlot(PDAC_obj, label = FALSE, group.by = "spatial.cluster", pt.size.factor = 8) + scale_fill_manual(values = my_colors) 
+```
+
+## Simply usage
+
+Enter the deconvolution result `spot_celltype` and the grouping information of the spot `spot_clusters` to get an `result_list` :
+
+-   `CellTopic` is a dataframe which can be add to a Seurat object.
+
+-   `domain_topic` is a dataframe, row is CellTopics and col is domains.
+
+-   `celltype_topic` is a dataframe, row is cell types and col is CellTopics.
+
+-   `Cell_topic` is a vector of which topic can be chosen in each CellTopic.
+
+For subsequent analyses, `CellTopic` and `celltype_topic` are mainly used.
+
+```{r}
+result_list <- CellTopic(
+  spot_celltype,
+  spot_clusters,
+  cluster = "spatial.cluster",
+  num_topics = 13
+)
+```
+
+## Plot
+
+You can add the results of `CellTopic` to meta.data of Seurat object through `AddMetaData` of Seurat, and display the spatial position of all CellTopics through `SpatialDimPlot` of Seurat.
+
+```{r, fig.height = 4, fig.width = 5}
+PDAC_obj <- AddMetaData(PDAC_obj, result_list[["CellTopic"]])
+SpatialDimPlot(PDAC_obj, group.by = "CellTopic",pt.size.factor = 8)
+```
+
+And `CellTopic_plot` can be used to display the spatial location and cell type of one or more CellTopics at the same time.
+
+Please use the Seurat object with CellTopic added as meta.data and the `celltype_topic` dataframe in the result list of `FindCellTopic` (or `CellTopic`) function as input.
+
+```{r, fig.height = 12, fig.width = 6}
+CellTopic_plot(PDAC_obj, 
+               celltype_topic = result_list[["celltype_topic"]], 
+               cols.highlight = c("#DE2D26", "#FEE0D2"),
+               cols.celltype = my_colors, 
+               pt.size.factor = 8)
+```
+
+## Optional parameters
+
+```{r}
+result_list <- CellTopic(
+  spot_celltype,
+  spot_clusters,
+  cluster = "spatial.cluster",
+  num_topics = 13,
+  percent = 0.7
+)
+```
+
+We recommend that the value of the `num_topics` is generally slightly larger than the group number of spots.
+
+The larger the `percent`, the more dependent the results of deconvolution. We recommend using a value of 0.5-0.9.
+
+### Another strategy
+
+If you want to focus less on percentages and more on the information carried by a single topic, you can use `Binarization = TRUE` .
+
+```{r, fig.height = 12, fig.width = 6}
+result_list <- CellTopic(
+  spot_celltype,
+  spot_clusters,
+  cluster = "spatial.cluster",
+  num_topics = 13,
+  Binarization = TRUE
+)
+PDAC_obj <- AddMetaData(PDAC_obj, result_list[["CellTopic"]])
+CellTopic_plot(PDAC_obj, 
+               celltype_topic = result_list[["celltype_topic"]], 
+               cols.highlight = c("#DE2D26", "#FEE0D2"),
+               cols.celltype = my_colors, 
+               pt.size.factor = 8)
+```
+
+### Meta Topic
+
+If you want to explore different spatial domains based on the cell type of the CellTopic, we provide a simple clustering option, `meta.cell = TRUE`.
+
+```{r}
+result_list <- CellTopic(
+  spot_celltype,
+  spot_clusters,
+  cluster = "spatial.cluster",
+  num_topics = 13,
+  percent = 0.7,
+  meta.cell = TRUE,
+  k = 3
+)
+head(result_list[["MetaTopic"]])
+```
+
+Parameter k is a integer number of MetaTopics. Hierarchical clustering algorithm is used by default

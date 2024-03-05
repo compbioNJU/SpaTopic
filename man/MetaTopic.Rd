@@ -9,7 +9,7 @@ MetaTopic(ct_topic_data, k, method)
 \arguments{
 \item{ct_topic_data}{A data frame, row is celltype and col is CellTopic.}
 
-\item{k}{A integer of how much MetaTopic to choose.}
+\item{k}{A integer number of MetaTopics.}
 
 \item{method}{See \code{\link[stats]{hclust}}.}
 }

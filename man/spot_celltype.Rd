@@ -3,7 +3,7 @@
 \docType{data}
 \name{spot_celltype}
 \alias{spot_celltype}
-\title{Deconvolution results of single-cell versus spatial transcriptome}
+\title{Deconvolution results of single-cell versus spatial transcriptome.}
 \format{
 A data frame with 428 rows and 15 variables
 }
@@ -11,6 +11,6 @@ A data frame with 428 rows and 15 variables
 spot_celltype
 }
 \description{
-A data frame for each cell type in each spot using the CARD deconvolution method
+A data frame for each cell type in each spot using the CARD deconvolution method.
 }
-\keyword{datasets}
+\keyword{internal}

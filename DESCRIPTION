@@ -17,8 +17,12 @@ Description: SpaTopic, a versatile statistical learning framework that harmonize
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+LazyDataCompression: xz
 RoxygenNote: 7.3.1
 Imports: 
+    cowplot,
+    ggforce,
+    ggplot2,
     modeltools,
     slam,
     stats,
@@ -26,15 +30,21 @@ Imports:
 Collate: 
     'SpaTopic_function.R'
     'SpaTopic.R'
+    'SpaTopic_plot.R'
     'data.R'
 Suggests: 
+    CellChat,
     knitr,
+    pheatmap,
+    RColorBrewer,
+    reshape2,
     rmarkdown,
-    ggplot2,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    tidyverse
 Config/testthat/edition: 3
 Depends: 
-    R (>= 2.10)
+    R (>= 3.5.0),
+    Seurat
 URL: https://github.com/compbioNJU/SpaTopic
 BugReports: https://github.com/compbioNJU/SpaTopic/issues
 VignetteBuilder: knitr
