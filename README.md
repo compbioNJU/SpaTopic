@@ -2,9 +2,9 @@
 
 ## A Statistical Learning Framework for Exploring Tumor Spatial Architecture from Spatially Resolved Transcriptomic Data.
 
-::: {align="center"}
+
 ![](https://github.com/compbioNJU/SpaTopic/blob/main/Fig/Fig1.png)
-:::
+
 
 Here, we introduce SpaTopic, a versatile statistical learning framework that harmonizes spatial clustering and cell-type deconvolution by integrating single-cell transcriptomics and SRT data. The objective of SpaTopic is to identify spatial clusters of spots within the SRT data, characterized by homogenous gene expression and cell-type organization. Each unique cluster of spots is viewed as a distinct spatial domain, presenting discernible patterns that set it apart from other clusters. SpaTopic significantly aids in the characterization of spatial domains, capitalising on the contributions from their corresponding cell-type topics. This enables the quantitative comparison of spatial domains and the identification of spatial regions prevalent across various SRT datasets. SpaTopic is implemented as an open-source R package, freely available at <https://github.com/compbioNJU/SpaTopic>.
 
