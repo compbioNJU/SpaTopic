@@ -3,7 +3,7 @@
 character()
 #' @title ksTest
 #' @description
-#' KS test is performed on the deconvolution results and the overall level of
+#' Kolmogorov-Smirnov (KS) test is performed on the deconvolution results and the overall level of
 #' each cluster.
 #'
 #' @param spot_celltype A data frame of the result of deconvolution, row
@@ -83,6 +83,7 @@ ksTest <- function(
 #' @importFrom slam as.simple_triplet_matrix
 #' @importFrom topicmodels LDA
 #' @importFrom modeltools posterior
+#'
 #' @export
 #'
 MatrixFactorization <- function(domain_cellytpe, num_topics = NULL) {
@@ -95,9 +96,9 @@ MatrixFactorization <- function(domain_cellytpe, num_topics = NULL) {
   # Generate corpus
   corpus <- slam::as.simple_triplet_matrix(as.matrix(domain_cellytpe_integer))
   if (is.null(num_topics)) {
-    num_topics <- tryTopic(corpus)
+    num_topics <- TryTopic(corpus)
   }else if(length(num_topics) > 1){
-    num_topics <- tryTopic(corpus, num_topics)
+    num_topics <- TryTopic(corpus, num_topics)
   }
   # Run the LDA model
   lda_model <- topicmodels::LDA(corpus, k = num_topics, control = list(seed = 1234))
@@ -107,8 +108,7 @@ MatrixFactorization <- function(domain_cellytpe, num_topics = NULL) {
   dt_topic_data <- as.data.frame(t(dt_topic_data))
   # celltype topic
   ct_topic_data <- modeltools::posterior(lda_model)$terms
-  colnames(ct_topic_data) <- colnames(spot_celltype)
-  row.names(ct_topic_data) <- paste0("topic", 1:nrow(ct_topic_data))
+  rownames(ct_topic_data) <- paste0("topic", 1:nrow(ct_topic_data))
   ct_topic_data <- as.data.frame(t(ct_topic_data))
   # result list
   topic_list <- list(
@@ -133,7 +133,7 @@ TryTopic <- function(corpus, num_topics_to_try = NULL) {
   if (is.null(num_topics_to_try)) {
     num_topics_to_try <- 7:20
   }
-  perplexities <- sapply(num_topics_to_try, perplexity_calculation, corpus)
+  perplexities <- sapply(num_topics_to_try, Perplexity_calculation, corpus)
   best_num_topics <- num_topics_to_try[which.min(perplexities)]
   return(best_num_topics)
 }
@@ -198,7 +198,7 @@ FindCellTopic <- function(
     cat("You can use these clusters:\n", colnames(spot_clusters), "\n")
     stop("The selected cluster is not in the data!")
   } else if (!identical(as.character(sort(unique(spot_clusters[[cluster]]))),
-                        sort(gsub("spot_domain_", "", colnames(dt_topic_data))))) {
+                        gsub("spot_domain_", "", colnames(dt_topic_data)))) {
     stop("Be sure to use the same cluster in function ksTest")
   }
   if (is.null(percent)) {
@@ -214,14 +214,16 @@ FindCellTopic <- function(
   MetaT <- spot_clusters[cluster]
   clst <- as.character(unique(sort(MetaT[[cluster]])))
   MetaT[[cluster]] <- as.character(MetaT[[cluster]])
+  MetaT$topic <- character(nrow(MetaT))
   for (i in 1:length(clst)) {
-    MetaT[which(MetaT[[cluster]] == clst[i]), ] <- as.character(tpc_choose)[i]
+    MetaT$topic[which(MetaT[[cluster]] == clst[i])] <- as.character(tpc_choose)[i]
   }
   ct_data <- data.frame(matrix(ncol = 0, nrow = nrow(ct_topic_data)))
   rownames(ct_data) <- rownames(ct_topic_data)
   dt_data <- data.frame(matrix(ncol = ncol(dt_topic_data), nrow = 0))
   colnames(dt_data) <- colnames(dt_topic_data)
   Cell_topic <- c()
+  MetaT$CellTopic <- character(nrow(MetaT))
   for (i in 1:length(unique(tpc_choose))) {
     ct_add <- rep(0, nrow(ct_topic_data))
     dt_add <- rep(0, ncol(dt_topic_data))
@@ -234,11 +236,11 @@ FindCellTopic <- function(
     colnames(ct_data)[ncol(ct_data)] <- CellTopic
     dt_data <- rbind(dt_data, dt_add)
     rownames(dt_data)[nrow(dt_data)] <- CellTopic
-    MetaT[which(MetaT == unique(as.character(lapply(tpc_choose, unname)))[[i]]), ] <- CellTopic
+    MetaT$CellTopic[which(MetaT$topic == unique(as.character(lapply(tpc_choose, unname)))[[i]])] <- CellTopic
     Cell_topic <- c(Cell_topic, paste(unique(tpc_choose)[[i]], collapse = "_"))
     names(Cell_topic)[i] <- CellTopic
   }
-  colnames(MetaT) <- "CellTopic"
+  MetaT <- MetaT["CellTopic"]
   # Normalization
   ct_data <- as.data.frame(apply(ct_data, 2, function(x) {return(x / sum(x))}))
   # Add each CellTopic to metadata
@@ -308,7 +310,7 @@ TopTopic <- function(dt_topic_data){
 #' Make a MetaTopic from CellTopic by celltype scores.
 #'
 #' @param ct_topic_data A data frame, row is celltype and col is CellTopic.
-#' @param k A integer of how much MetaTopic to choose.
+#' @param k A integer number of MetaTopics.
 #' @param method See \code{\link[stats]{hclust}}.
 #'
 #' @return A data frame of the cluster result of CellTopic.
