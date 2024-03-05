@@ -51,8 +51,8 @@ library(SpaTopic)
 ### load the data
 
 ``` r
-load("/mnt/public2/yubj/spatopic/data/spot_clusters.rda")
-load("/mnt/public2/yubj/spatopic/data/spot_celltype.rda")
+load("data/spot_clusters.rda")
+load("data/spot_celltype.rda")
 ```
 
 ``` r
