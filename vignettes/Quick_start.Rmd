@@ -9,13 +9,13 @@ vignette: >
 
 ```{r, setup, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
+  results = "hold",
   comment = "",
   warning = FALSE
 )
 ```
 
-```{r}
+```{r, message=FALSE}
 library(SpaTopic)
 library(ggplot2)
 my_colors <- c("#66b803", "#E5AA9B", "#FABD3E", "#2B8CBE", "#DE77AE", "#9970AB", "gray", "#D5E4A2", "#71D0F5", "#B1746F", "#ADE2D0", "#20DE8BFF", "#CCDE8BFF", "#FFDE8BFF", "#FFA88BFF", "#FF6A8BFF")
