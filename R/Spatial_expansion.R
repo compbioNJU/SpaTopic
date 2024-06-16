@@ -1,19 +1,19 @@
 #' @title Spatial_expansion
 #' @description
-#' Buffers and angles for dividing the specified spatial domain.
+#' Applies buffering and angle calculations to divide the specified spatial domain within a Seurat object.
 #'
 #' @param st_obj A Seurat object.
-#' @param CellTopic A character of which CellTopic to be chosen.
-#' @param meta.col A character of which meta.data to be chosen. Default is \code{"CellTopic"}.
-#' @param distance A numeric. The distance of expansion. Default is \code{NULL},
-#' use the nearest spot distance.
-#' @param alpha A numeric used for alpha-shape calculation. Default is \code{NULL},
-#' use nearest spot distance based on data type. See also \code{\link[alphahull]{ashape}}.
-#' @param type By default \code{type = "Hexagon"} for data with hexagonal spot arrangement.
-#' When the spot arrangement of data is square, set \code{tpye = "Square"}.
-#' @param edge.plot Logical indicating if to display the regional division plot
-#' of CellTopic. Default is \code{TRUE}.
-#' @param image.factor A character of the resolution scale factor. Default is \code{"lowres"}.
+#' @param CellTopic A character string specifying the CellTopic to be chosen.
+#' @param meta.col A character string specifying the meta.data column to be used. Defaults to \code{"CellTopic"}.
+#' @param distance A numeric value indicating the distance of expansion. Defaults to \code{NULL},
+#' in which case the nearest spot distance will be used.
+#' @param alpha A numeric value used for alpha-shape calculation. Defaults to \code{NULL},
+#' which uses the nearest spot distance based on data type. See also \code{\link[alphahull]{ashape}} for more details.
+#' @param type A character string specifying the type of spot arrangement. Defaults to \code{"Hexagon"} for data with hexagonal spot arrangements.
+#' For square spot arrangements, set \code{type = "Square"}.
+#' @param edge.plot Logical indicating whether to display the regional division plot
+#' for the specified CellTopic. Defaults to \code{TRUE}.
+#' @param image.factor A character string specifying the resolution scale factor. Defaults to \code{"lowres"}.
 #'
 #' @return A Seurat object. The expansion of the data is added to the \code{Seurat@meta.data}
 #' and the message is added to \code{Seurat@misc}.

@@ -18,28 +18,28 @@ Spatial_expansion(
 \arguments{
 \item{st_obj}{A Seurat object.}
 
-\item{CellTopic}{A character of which CellTopic to be chosen.}
+\item{CellTopic}{A character string specifying the CellTopic to be chosen.}
 
-\item{meta.col}{A character of which meta.data to be chosen. Default is \code{"CellTopic"}.}
+\item{meta.col}{A character string specifying the meta.data column to be used. Defaults to \code{"CellTopic"}.}
 
-\item{distance}{A numeric. The distance of expansion. Default is \code{NULL},
-use the nearest spot distance.}
+\item{distance}{A numeric value indicating the distance of expansion. Defaults to \code{NULL},
+in which case the nearest spot distance will be used.}
 
-\item{alpha}{A numeric used for alpha-shape calculation. Default is \code{NULL},
-use nearest spot distance based on data type. See also \code{\link[alphahull]{ashape}}.}
+\item{alpha}{A numeric value used for alpha-shape calculation. Defaults to \code{NULL},
+which uses the nearest spot distance based on data type. See also \code{\link[alphahull]{ashape}} for more details.}
 
-\item{type}{By default \code{type = "Hexagon"} for data with hexagonal spot arrangement.
-When the spot arrangement of data is square, set \code{tpye = "Square"}.}
+\item{type}{A character string specifying the type of spot arrangement. Defaults to \code{"Hexagon"} for data with hexagonal spot arrangements.
+For square spot arrangements, set \code{type = "Square"}.}
 
-\item{edge.plot}{Logical indicating if to display the regional division plot
-of CellTopic. Default is \code{TRUE}.}
+\item{edge.plot}{Logical indicating whether to display the regional division plot
+for the specified CellTopic. Defaults to \code{TRUE}.}
 
-\item{image.factor}{A character of the resolution scale factor. Default is \code{"lowres"}.}
+\item{image.factor}{A character string specifying the resolution scale factor. Defaults to \code{"lowres"}.}
 }
 \value{
 A Seurat object. The expansion of the data is added to the \code{Seurat@meta.data}
 and the message is added to \code{Seurat@misc}.
 }
 \description{
-Buffers and angles for dividing the specified spatial domain.
+Applies buffering and angle calculations to divide the specified spatial domain within a Seurat object.
 }
