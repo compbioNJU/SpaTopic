@@ -16,6 +16,9 @@
     <loc>/articles/SimplyUsage.html</loc>
   </url>
   <url>
+    <loc>/articles/Spatial_expansion.html</loc>
+  </url>
+  <url>
     <loc>/articles/SpaTopic_workflow.html</loc>
   </url>
   <url>
@@ -40,6 +43,9 @@
     <loc>/reference/CellTopic_plot.html</loc>
   </url>
   <url>
+    <loc>/reference/Expansion_gene_plot.html</loc>
+  </url>
+  <url>
     <loc>/reference/FindCellTopic.html</loc>
   </url>
   <url>
@@ -53,6 +59,9 @@
   </url>
   <url>
     <loc>/reference/MetaTopic.html</loc>
+  </url>
+  <url>
+    <loc>/reference/Spatial_expansion.html</loc>
   </url>
   <url>
     <loc>/reference/spot_celltype.html</loc>

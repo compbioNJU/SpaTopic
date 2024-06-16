@@ -9,7 +9,7 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
+  results = "hold",
   comment = "",
   warning = FALSE
 )
@@ -74,8 +74,6 @@ CellTopic_plot(HCC_1L_obj,
                pt.size.factor = 2.2)
 ```
 
-
-
 CellTopic8 mainly represents the tumor boundary, and its major cell types include fibroblast cells, pDC cells and B cells.
 
 ```{r, fig.height = 6, fig.width = 3}
@@ -87,9 +85,10 @@ CellTopic_plot(HCC_1L_obj,
                pt.size.factor = 2.2)
 ```
 
-Additionally, CellTopic 7 is found in the paraneoplastic region, predominantly consisting of plasmacytoid dendritic cells (pDCs), B cells, and myeloid cells. 
+Additionally, CellTopic 7 is found in the paraneoplastic region, predominantly consisting of plasmacytoid dendritic cells (pDCs), B cells, and myeloid cells.
 
 On the right, we observe the scoring for spots using the "[TLS50](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8683021/)" gene set, which is considered to be the gene signature for the identification of TLSs.
+
 ```{r, fig.height = 6, fig.width=5, out.width = '50%', fig.show = "hold"}
 CellTopic_plot(HCC_1L_obj, 
                celltype_topic = result_list[["celltype_topic"]], 
@@ -129,11 +128,10 @@ p <- pheatmap(corr,
          cutree_cols = 7
 )
 ```
+
 Utilizing the Wilcoxon test, we discerned the cell types that exhibit high expression for each MetaTopic. The heatmap below displays the mean expression of each cell type within each MetaTopic, with the p-values indicating the significance of the differences in expression levels.
 
-```{r}
-
-```{r}
+```{r, message=FALSE}
 library(reshape2)
 row_cluster <- cutree(p$tree_row,k=7) %>% as.data.frame()
 colnames(row_cluster) <- "cluster"
@@ -178,7 +176,6 @@ df_pp_cluster <- apply(df_pp, 2, function(x){ifelse(min(x) <= 0.05, return(which
   as.data.frame()
 df_pp_cluster$. <- as.character(df_pp_cluster$.)
 colnames(df_pp_cluster) <- "high in MetaTopics"
-df_pp_cluster$`high in MetaTopics`
 mycolor <- c("#f94144", "#f8961e", "#f7f31c", "#77bb43", "#429f9c", "#3574b8", "#bb3892", "grey")
 names(mycolor) <- c("1", "2", "3", "4", "5", "6", "7", "none")
 df[,df_pp_cluster_name] %>% t() %>%

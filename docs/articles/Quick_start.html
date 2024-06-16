@@ -43,6 +43,7 @@
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/CellTopic_analysis.html">CellTopic analysis</a>
     <a class="dropdown-item" href="../articles/Quick_start.html">Quick start</a>
+    <a class="dropdown-item" href="../articles/Spatial_expansion.html">Spatial expansion</a>
     <a class="dropdown-item" href="../articles/SpaTopic_workflow.html">SpaTopic workflow</a>
   </div>
 </li>
@@ -79,17 +80,10 @@
 
     
     
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(SpaTopic)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>Loading required package<span class="sc">:</span> Seurat</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>Loading required package<span class="sc">:</span> SeuratObject</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>Loading required package<span class="sc">:</span> sp</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>Attaching package<span class="sc">:</span> <span class="st">'SeuratObject'</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>The following object is masked from <span class="st">'package:base'</span><span class="sc">:</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    intersect</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>my_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#66b803"</span>, <span class="st">"#E5AA9B"</span>, <span class="st">"#FABD3E"</span>, <span class="st">"#2B8CBE"</span>, <span class="st">"#DE77AE"</span>, <span class="st">"#9970AB"</span>, <span class="st">"gray"</span>, <span class="st">"#D5E4A2"</span>, <span class="st">"#71D0F5"</span>, <span class="st">"#B1746F"</span>, <span class="st">"#ADE2D0"</span>, <span class="st">"#20DE8BFF"</span>, <span class="st">"#CCDE8BFF"</span>, <span class="st">"#FFDE8BFF"</span>, <span class="st">"#FFA88BFF"</span>, <span class="st">"#FF6A8BFF"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/compbioNJU/SpaTopic" class="external-link">SpaTopic</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="va">my_colors</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#66b803"</span>, <span class="st">"#E5AA9B"</span>, <span class="st">"#FABD3E"</span>, <span class="st">"#2B8CBE"</span>, <span class="st">"#DE77AE"</span>, <span class="st">"#9970AB"</span>, <span class="st">"gray"</span>, <span class="st">"#D5E4A2"</span>, <span class="st">"#71D0F5"</span>, <span class="st">"#B1746F"</span>, <span class="st">"#ADE2D0"</span>, <span class="st">"#20DE8BFF"</span>, <span class="st">"#CCDE8BFF"</span>, <span class="st">"#FFDE8BFF"</span>, <span class="st">"#FFA88BFF"</span>, <span class="st">"#FF6A8BFF"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="load-data">Load data<a class="anchor" aria-label="anchor" href="#load-data"></a>
 </h2>
@@ -102,38 +96,40 @@ spots and columns as cell types.*</p></li>
 information.*</p></li>
 </ul>
 <p>And they should be like</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"spot_celltype"</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="st">"spot_clusters"</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(spot_celltype)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>      Acinar_cells Ductal_cells Cancer_clone_A Cancer_clone_B         DCs</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>10x10 <span class="fl">5.838572e-02</span>    <span class="fl">0.2349066</span>   <span class="fl">1.365076e-03</span>   <span class="fl">3.892868e-04</span> <span class="fl">0.165860789</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>10x13 <span class="fl">4.807943e-05</span>    <span class="fl">0.9984677</span>   <span class="fl">1.654640e-06</span>   <span class="fl">9.032885e-06</span> <span class="fl">0.001244634</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>10x14 <span class="fl">4.701190e-02</span>    <span class="fl">0.8373601</span>   <span class="fl">4.846860e-03</span>   <span class="fl">9.009235e-04</span> <span class="fl">0.003541947</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>10x15 <span class="fl">5.047613e-02</span>    <span class="fl">0.8020465</span>   <span class="fl">1.911570e-04</span>   <span class="fl">3.325224e-02</span> <span class="fl">0.084113110</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>10x16 <span class="fl">4.694120e-03</span>    <span class="fl">0.9718078</span>   <span class="fl">1.719378e-06</span>   <span class="fl">6.266388e-04</span> <span class="fl">0.007665514</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>10x17 <span class="fl">6.850619e-02</span>    <span class="fl">0.7737652</span>   <span class="fl">1.034929e-02</span>   <span class="fl">5.242836e-02</span> <span class="fl">0.030090839</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        Tuft_cells         pDCs Endocrine_cells Endothelial_cells  Macrophages</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>10x10 <span class="fl">1.149557e-02</span> <span class="fl">5.750904e-05</span>    <span class="fl">3.794494e-03</span>      <span class="fl">1.554314e-01</span> <span class="fl">7.575614e-02</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>10x13 <span class="fl">1.411944e-04</span> <span class="fl">2.179189e-08</span>    <span class="fl">2.791803e-08</span>      <span class="fl">2.522234e-08</span> <span class="fl">4.952721e-05</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>10x14 <span class="fl">2.430843e-05</span> <span class="fl">6.745099e-05</span>    <span class="fl">7.014669e-08</span>      <span class="fl">9.208190e-03</span> <span class="fl">3.539390e-02</span></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>10x15 <span class="fl">3.087975e-07</span> <span class="fl">2.387285e-04</span>    <span class="fl">1.660241e-07</span>      <span class="fl">3.787078e-04</span> <span class="fl">1.868701e-02</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>10x16 <span class="fl">2.859347e-07</span> <span class="fl">1.835252e-04</span>    <span class="fl">9.321908e-09</span>      <span class="fl">1.535896e-04</span> <span class="fl">2.258778e-05</span></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>10x17 <span class="fl">7.639672e-04</span> <span class="fl">1.963630e-04</span>    <span class="fl">1.888457e-04</span>      <span class="fl">2.610257e-03</span> <span class="fl">1.254141e-03</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        Mast_cells T_cells_._NK_cells    Monocytes         RBCs  Fibroblasts</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>10x10 <span class="fl">1.335059e-07</span>       <span class="fl">1.419896e-05</span> <span class="fl">6.324585e-05</span> <span class="fl">6.935704e-08</span> <span class="fl">2.924798e-01</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>10x13 <span class="fl">2.560977e-08</span>       <span class="fl">8.100230e-10</span> <span class="fl">2.999011e-05</span> <span class="fl">4.812122e-06</span> <span class="fl">3.255235e-06</span></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>10x14 <span class="fl">7.319528e-06</span>       <span class="fl">2.780869e-06</span> <span class="fl">8.047062e-04</span> <span class="fl">7.357054e-06</span> <span class="fl">6.082224e-02</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>10x15 <span class="fl">9.115675e-07</span>       <span class="fl">2.629728e-06</span> <span class="fl">4.568320e-04</span> <span class="fl">2.846073e-05</span> <span class="fl">1.012715e-02</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>10x16 <span class="fl">6.924793e-07</span>       <span class="fl">2.044994e-05</span> <span class="fl">1.654387e-06</span> <span class="fl">1.444002e-09</span> <span class="fl">1.482138e-02</span></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>10x17 <span class="fl">4.102771e-06</span>       <span class="fl">1.894866e-04</span> <span class="fl">6.179414e-04</span> <span class="fl">3.425166e-06</span> <span class="fl">5.903159e-02</span></span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(spot_clusters)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>      row col sizeFactor cluster.init spatial.cluster</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>10x10  <span class="dv">10</span>  <span class="dv">10</span>  <span class="fl">4.7761108</span>            <span class="dv">1</span>               <span class="dv">2</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>10x13  <span class="dv">10</span>  <span class="dv">13</span>  <span class="fl">1.0052199</span>            <span class="dv">2</span>               <span class="dv">2</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>10x14  <span class="dv">10</span>  <span class="dv">14</span>  <span class="fl">0.8106812</span>            <span class="dv">2</span>               <span class="dv">2</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>10x15  <span class="dv">10</span>  <span class="dv">15</span>  <span class="fl">0.4987377</span>            <span class="dv">2</span>               <span class="dv">2</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>10x16  <span class="dv">10</span>  <span class="dv">16</span>  <span class="fl">0.4346143</span>            <span class="dv">2</span>               <span class="dv">2</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>10x17  <span class="dv">10</span>  <span class="dv">17</span>  <span class="fl">0.7446991</span>            <span class="dv">2</span>               <span class="dv">2</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"spot_celltype"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"spot_clusters"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">spot_celltype</span><span class="op">)</span></span></code></pre></div>
+<pre><code>      Acinar_cells Ductal_cells Cancer_clone_A Cancer_clone_B         DCs
+10x10 5.838572e-02    0.2349066   1.365076e-03   3.892868e-04 0.165860789
+10x13 4.807943e-05    0.9984677   1.654640e-06   9.032885e-06 0.001244634
+10x14 4.701190e-02    0.8373601   4.846860e-03   9.009235e-04 0.003541947
+10x15 5.047613e-02    0.8020465   1.911570e-04   3.325224e-02 0.084113110
+10x16 4.694120e-03    0.9718078   1.719378e-06   6.266388e-04 0.007665514
+10x17 6.850619e-02    0.7737652   1.034929e-02   5.242836e-02 0.030090839
+        Tuft_cells         pDCs Endocrine_cells Endothelial_cells  Macrophages
+10x10 1.149557e-02 5.750904e-05    3.794494e-03      1.554314e-01 7.575614e-02
+10x13 1.411944e-04 2.179189e-08    2.791803e-08      2.522234e-08 4.952721e-05
+10x14 2.430843e-05 6.745099e-05    7.014669e-08      9.208190e-03 3.539390e-02
+10x15 3.087975e-07 2.387285e-04    1.660241e-07      3.787078e-04 1.868701e-02
+10x16 2.859347e-07 1.835252e-04    9.321908e-09      1.535896e-04 2.258778e-05
+10x17 7.639672e-04 1.963630e-04    1.888457e-04      2.610257e-03 1.254141e-03
+        Mast_cells T_cells_._NK_cells    Monocytes         RBCs  Fibroblasts
+10x10 1.335059e-07       1.419896e-05 6.324585e-05 6.935704e-08 2.924798e-01
+10x13 2.560977e-08       8.100230e-10 2.999011e-05 4.812122e-06 3.255235e-06
+10x14 7.319528e-06       2.780869e-06 8.047062e-04 7.357054e-06 6.082224e-02
+10x15 9.115675e-07       2.629728e-06 4.568320e-04 2.846073e-05 1.012715e-02
+10x16 6.924793e-07       2.044994e-05 1.654387e-06 1.444002e-09 1.482138e-02
+10x17 4.102771e-06       1.894866e-04 6.179414e-04 3.425166e-06 5.903159e-02</code></pre>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">spot_clusters</span><span class="op">)</span></span></code></pre></div>
+<pre><code>      row col sizeFactor cluster.init spatial.cluster
+10x10  10  10  4.7761108            1               2
+10x13  10  13  1.0052199            2               2
+10x14  10  14  0.8106812            2               2
+10x15  10  15  0.4987377            2               2
+10x16  10  16  0.4346143            2               2
+10x17  10  17  0.7446991            2               2</code></pre>
 <p>*The data used here is from <a href="https://github.com/YMa-lab/CARD" class="external-link">CARD</a>
 (<code>spot_celltype</code>) and <a href="https://github.com/edward130603/BayesSpace" class="external-link">BayesSpace</a>
 (<code>spot_clusters</code>).</p>
@@ -144,7 +140,7 @@ information.*</p></li>
 (Data used here is processed by SCTransform) The
 <code>spot_celltype</code> and <code>spot_clusters</code> is based on
 it.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="st">"vignette_data/PDAC_obj.rda"</span><span class="op">)</span></span>
 <span><span class="va">PDAC_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/SeuratObject/man/AddMetaData.html" class="external-link">AddMetaData</a></span><span class="op">(</span><span class="va">PDAC_obj</span>, <span class="va">spot_clusters</span><span class="op">[</span><span class="st">"spatial.cluster"</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://satijalab.org/seurat/reference/DimPlot.html" class="external-link">DimPlot</a></span><span class="op">(</span><span class="va">PDAC_obj</span>, group.by <span class="op">=</span> <span class="st">'spatial.cluster'</span>, reduction <span class="op">=</span> <span class="st">"umap"</span>,cols <span class="op">=</span> <span class="va">my_colors</span><span class="op">)</span></span>
@@ -170,7 +166,7 @@ in each CellTopic.</p></li>
 </ul>
 <p>For subsequent analyses, <code>CellTopic</code> and
 <code>celltype_topic</code> are mainly used.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/CellTopic.html">CellTopic</a></span><span class="op">(</span></span>
 <span>  <span class="va">spot_celltype</span>,</span>
 <span>  <span class="va">spot_clusters</span>,</span>
@@ -185,7 +181,7 @@ in each CellTopic.</p></li>
 Seurat object through <code>AddMetaData</code> of Seurat, and display
 the spatial position of all CellTopics through
 <code>SpatialDimPlot</code> of Seurat.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">PDAC_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/SeuratObject/man/AddMetaData.html" class="external-link">AddMetaData</a></span><span class="op">(</span><span class="va">PDAC_obj</span>, <span class="va">result_list</span><span class="op">[[</span><span class="st">"CellTopic"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://satijalab.org/seurat/reference/SpatialPlot.html" class="external-link">SpatialDimPlot</a></span><span class="op">(</span><span class="va">PDAC_obj</span>, group.by <span class="op">=</span> <span class="st">"CellTopic"</span>,pt.size.factor <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Quick_start_files/figure-html/unnamed-chunk-6-1.png" width="480"></p>
@@ -195,7 +191,7 @@ location and cell type of one or more CellTopics at the same time.</p>
 the <code>celltype_topic</code> dataframe in the result list of
 <code>FindCellTopic</code> (or <code>CellTopic</code>) function as
 input.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/CellTopic_plot.html">CellTopic_plot</a></span><span class="op">(</span><span class="va">PDAC_obj</span>, </span>
 <span>               celltype_topic <span class="op">=</span> <span class="va">result_list</span><span class="op">[[</span><span class="st">"celltype_topic"</span><span class="op">]</span><span class="op">]</span>, </span>
 <span>               cols.highlight <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#DE2D26"</span>, <span class="st">"#FEE0D2"</span><span class="op">)</span>,</span>
@@ -206,7 +202,7 @@ input.</p>
 <div class="section level2">
 <h2 id="optional-parameters">Optional parameters<a class="anchor" aria-label="anchor" href="#optional-parameters"></a>
 </h2>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/CellTopic.html">CellTopic</a></span><span class="op">(</span></span>
 <span>  <span class="va">spot_celltype</span>,</span>
 <span>  <span class="va">spot_clusters</span>,</span>
@@ -224,7 +220,7 @@ of deconvolution. We recommend using a value of 0.5-0.9.</p>
 <p>If you want to focus less on percentages and more on the information
 carried by a single topic, you can use <code>Binarization = TRUE</code>
 .</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/CellTopic.html">CellTopic</a></span><span class="op">(</span></span>
 <span>  <span class="va">spot_celltype</span>,</span>
 <span>  <span class="va">spot_clusters</span>,</span>
@@ -246,21 +242,22 @@ carried by a single topic, you can use <code>Binarization = TRUE</code>
 <p>If you want to explore different spatial domains based on the cell
 type of the CellTopic, we provide a simple clustering option,
 <code>meta.cell = TRUE</code>.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>result_list <span class="ot">&lt;-</span> <span class="fu">CellTopic</span>(</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  spot_celltype,</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  spot_clusters,</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">cluster =</span> <span class="st">"spatial.cluster"</span>,</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">num_topics =</span> <span class="dv">13</span>,</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">percent =</span> <span class="fl">0.7</span>,</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">meta.cell =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">k =</span> <span class="dv">3</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(result_list[[<span class="st">"MetaTopic"</span>]])</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>           MetaCluster</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>CellTopic1           <span class="dv">1</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>CellTopic2           <span class="dv">1</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>CellTopic3           <span class="dv">2</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>CellTopic4           <span class="dv">3</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">result_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/CellTopic.html">CellTopic</a></span><span class="op">(</span></span>
+<span>  <span class="va">spot_celltype</span>,</span>
+<span>  <span class="va">spot_clusters</span>,</span>
+<span>  cluster <span class="op">=</span> <span class="st">"spatial.cluster"</span>,</span>
+<span>  num_topics <span class="op">=</span> <span class="fl">13</span>,</span>
+<span>  percent <span class="op">=</span> <span class="fl">0.7</span>,</span>
+<span>  meta.cell <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  k <span class="op">=</span> <span class="fl">3</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result_list</span><span class="op">[[</span><span class="st">"MetaTopic"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<pre><code>           MetaCluster
+CellTopic1           1
+CellTopic2           1
+CellTopic3           2
+CellTopic4           3</code></pre>
 <p>Parameter k is a integer number of MetaTopics. Hierarchical
 clustering algorithm is used by default</p>
 </div>
