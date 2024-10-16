@@ -32,6 +32,8 @@ load("vignette_data/HCC_1L_obj.rda")
 load("vignette_data/HCC_1L_spot_celltype.rda")
 ```
 
+The "HCC_1L_obj.rda" comes from <https://www.science.org/doi/10.1126/sciadv.abg3750>.
+
 ### cluster
 
 Here we use the clustering method 'Seurat', parameters are as follows, the data has been processed by `SCTransform`.
