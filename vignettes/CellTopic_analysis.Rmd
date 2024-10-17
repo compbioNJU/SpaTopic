@@ -32,7 +32,7 @@ load("vignette_data/HCC_1L_obj.rda")
 load("vignette_data/HCC_1L_spot_celltype.rda")
 ```
 
-The "HCC_1L_obj.rda" comes from <https://www.science.org/doi/10.1126/sciadv.abg3750>.
+The "HCC_1L_obj" data is a Seurat object that has been normalized using `SCTransform`. This data is mentioned in the section on \"Data and Materials Availability\" in our [paper](https://www.science.org/doi/10.1126/sciadv.adp4942#sec-4).
 
 ### cluster
 
