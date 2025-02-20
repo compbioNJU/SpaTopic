@@ -146,8 +146,7 @@
               using <code>SCTransform</code>
               . This data is mentioned in the section on
               &quot;Data and Materials Availability &quot;in our <a
-                href="https://www.science.org/doi/10.1126/sciadv.adp4942#sec-4">paper</a>
-              . "HCC_1L_obj.rda" data can be downloaded directly from <a
+                href="https://www.science.org/doi/10.1126/sciadv.adp4942#sec-4">paper</a>. The "HCC_1L_obj.rda" data can also be downloaded directly from <a
                 href="https://drive.google.com/file/d/1FyXskIWzEvfOvEIpQQeByPXsPP5NjR8u/view?usp=drive_link">here</a>.
             </p>
           </div>
@@ -320,7 +319,9 @@ B04_plasma_IGHG2    0.024964639</code></pre>
 <span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/spread.html" class="external-link">spread</a></span><span class="op">(</span><span class="va">celltype_min</span>, <span class="va">mean</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span>var <span class="op">=</span> <span class="st">"cluster"</span><span class="op">)</span></span></code></pre>
             </div>
-            <pre><code> [1m [22m`summarise()` has grouped output by 'cluster'. You can override using the
+            <pre><code>
+[1m
+[22m`summarise()` has grouped output by 'cluster'. You can override using the
 `.groups` argument.</code></pre>
             <div class="sourceCode" id="cb14">
               <pre class="downlit sourceCode r">
@@ -407,9 +408,9 @@ B04_plasma_IGHG2    0.024964639</code></pre>
 <span><span class="va">df.net</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/CellChat/man/subsetCommunication.html" class="external-link">subsetCommunication</a></span><span class="op">(</span><span class="va">cellchat</span><span class="op">)</span></span></code></pre>
             </div>
             <pre><code>[1] "Create a CellChat object from a data matrix"
-Set cell identities for the new CellChat object 
-The cell groups used for CellChat analysis are  CellTopic1 CellTopic2 CellTopic3 CellTopic4 
-triMean is used for calculating the average gene expression per cell group. 
+Set cell identities for the new CellChat object
+The cell groups used for CellChat analysis are  CellTopic1 CellTopic2 CellTopic3 CellTopic4
+triMean is used for calculating the average gene expression per cell group.
 [1] "&gt;&gt;&gt; Run CellChat on sc/snRNA-seq data &lt;&lt;&lt; [2024-06-16 18:20:44.033752]"
 [1] "&gt;&gt;&gt; CellChat inference is done. Parameter values are stored in `object@options$parameter` &lt;&lt;&lt; [2024-06-16 18:21:27.304678]"</code></pre>
             <p>Communication between different spatial domains from the perspective
